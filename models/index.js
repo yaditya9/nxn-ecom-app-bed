@@ -9,7 +9,7 @@ sequelize
   .then(() => {
     console.log(`Database connected!!!`);
   })
-  .catch((err) => {
+  .catch((error) => {
     console.log(`Error connecting to Db`);
     console.log(`Error is ${error}`);
   });

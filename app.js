@@ -66,6 +66,29 @@ app.post("/login", cors(corsOptions), async (req, res) => {
  */
 app.get("/products", cors(corsOptions), (req, res) => {});
 
+app.post("/createOrder", async (req, res) => {
+  try {
+    const { order, item, shippingDetail, billingDetail } = req.body;
+
+    // Create the order
+    const newOrder = await db.order.create(order);
+
+    // Create the item and associate it with the order
+    await db.item.create({ ...item, OrderId: newOrder.id });
+
+    // Create the shipping details and associate them with the order
+    await db.shippingDetail.create({ ...shippingDetail, OrderId: newOrder.id });
+
+    // Create the billing details and associate them with the order
+    await db.billingDetail.create({ ...billingDetail, OrderId: newOrder.id });
+
+    res.status(201).json({ message: "Order created successfully!" });
+  } catch (error) {
+    console.error("Error creating order:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 app.listen(port, () => {
   console.log(`listening on port ${port}`);
 });
