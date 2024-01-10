@@ -46,10 +46,18 @@ app.post("/login", cors(corsOptions), async (req, res) => {
   console.log(`Inside login`);
   try {
     const result = await login(req.body.email, req.body.password);
-    return res.json({ result: result });
+    //return res.json({ result: result });
+    return res.json({ result: result.token });
   } catch (error) {
     console.error(`error is ${JSON.stringify(error)}`);
-    return res.status(error.status).send(error.message);
+    if (error.status && error.message) {
+      return res.status(error.status).send(error.message);
+    }
+
+    // For any other errors, send a generic error message
+    return res.status(500).send("An error occurred");
+
+    /* return res.status(error.status || 500).send(error.message || 'Something went wrong!'); */
   }
 });
 

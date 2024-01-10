@@ -1,4 +1,10 @@
 // Order Model
+const { Sequelize, DataTypes } = require("sequelize");
+
+const sequelize = new Sequelize(
+  `postgres://postgres:test1324@localhost:5432/training`,
+  { dialect: "postgres" }
+);
 module.exports = (sequelize, DataTypes) => {
   const Order = sequelize.define(
     "Order",
@@ -30,30 +36,16 @@ module.exports = (sequelize, DataTypes) => {
     { timestamps: true }
   );
 
-  Order.associate = (models) => {
-    Order.belongsTo(models.User);
-    Order.hasOne(models.Item);
-    //Order.hasMany(models.Item); //For multiple items in 1 order 
-    Order.hasOne(models.ShippingDetail);
-    Order.hasOne(models.BillingDetail);
-  };
+  // Item Model
 
-  return Order;
-};
-
-// Item Model
-module.exports = (sequelize, DataTypes) => {
   const Item = sequelize.define("Item", {
     itemSKU: DataTypes.STRING,
     quantity: DataTypes.INTEGER,
     price: DataTypes.DECIMAL(10, 2),
   });
 
-  return Item;
-};
+  // ShippingDetail Model
 
-// ShippingDetail Model
-module.exports = (sequelize, DataTypes) => {
   const ShippingDetail = sequelize.define("ShippingDetail", {
     name: DataTypes.STRING,
     addressLine1: DataTypes.STRING,
@@ -62,11 +54,8 @@ module.exports = (sequelize, DataTypes) => {
     zipCode: DataTypes.STRING,
   });
 
-  return ShippingDetail;
-};
+  // BillingDetail Model
 
-// BillingDetail Model
-module.exports = (sequelize, DataTypes) => {
   const BillingDetail = sequelize.define("BillingDetail", {
     name: DataTypes.STRING,
     addressLine1: DataTypes.STRING,
@@ -74,6 +63,25 @@ module.exports = (sequelize, DataTypes) => {
     state: DataTypes.STRING,
     zipCode: DataTypes.STRING,
   });
-
-  return BillingDetail;
+  Order.associate = (models) => {
+    Order.belongsTo(models.User);
+    Order.hasOne(models.Item);
+    //Order.hasMany(models.Item); //For multiple items in 1 order
+    Order.hasOne(models.ShippingDetail);
+    Order.hasOne(models.BillingDetail);
+  };
+  return {
+    Order,
+    Item,
+    ShippingDetail,
+    BillingDetail,
+  };
 };
+/* sequelize
+  .sync({ force: true }) // Note: force: true will drop and recreate tables on every sync
+  .then(() => {
+    console.log("Tables created successfully!");
+  })
+  .catch((error) => {
+    console.error("Error creating tables:", error);
+  }); */
